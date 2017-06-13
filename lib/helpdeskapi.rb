@@ -6,6 +6,7 @@ require File.dirname(__FILE__) + '/helpdeskapi/authentication'
 require File.dirname(__FILE__) + '/helpdeskapi/ticket'
 require File.dirname(__FILE__) + '/helpdeskapi/request'
 require File.dirname(__FILE__) + '/helpdeskapi/tickets'
+require File.dirname(__FILE__) + '/helpdeskapi/users'
 
 module HelpDeskAPI
   class Client

@@ -2,9 +2,11 @@ require 'singleton'
 
 module Authentication
 
+  # Pass all function calls to Data singleton.
   def self.method_missing(m, *args, &block)
     Data.instance.send(m, *args)
   end
+
   private
   class Data
     include Singleton

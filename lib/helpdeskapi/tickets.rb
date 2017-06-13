@@ -1,44 +1,42 @@
 require File.dirname(__FILE__) + '/request'
 require File.dirname(__FILE__) + '/endpoints'
 require File.dirname(__FILE__) + '/ticket'
+require File.dirname(__FILE__) + '/utilities'
+
+require 'uri'
 
 module HelpDeskAPI
   module Tickets
     def self.search(query)
-      self.parse Request::request('GET', HelpDeskAPI::Endpoints::TICKETS_ALL+"?q=#{query}")
+      HelpDeskAPI::Utilities.parse_response HelpDeskAPI::Request.request('GET', HelpDeskAPI::Endpoints::TICKETS_ALL+"?q=#{URI.escape query}"), 'tickets', Ticket
     end
 
     def self.all
-      self.parse Request::request('GET', HelpDeskAPI::Endpoints::TICKETS_ALL)
+      HelpDeskAPI::Utilities.parse_response HelpDeskAPI::Request.request('GET', HelpDeskAPI::Endpoints::TICKETS_ALL), 'tickets', Ticket
     end
 
     def self.open
-      self.parse Request::request('GET', HelpDeskAPI::Endpoints::TICKETS_OPEN)
+      HelpDeskAPI::Utilities.parse_response HelpDeskAPI::Request.request('GET', HelpDeskAPI::Endpoints::TICKETS_OPEN), 'tickets', Ticket
     end
 
     def self.closed
-      self.parse Request::request('GET', HelpDeskAPI::Endpoints::TICKETS_CLOSED)
+      HelpDeskAPI::Utilities.parse_response HelpDeskAPI::Request.request('GET', HelpDeskAPI::Endpoints::TICKETS_CLOSED), 'tickets', Ticket
     end
 
     def self.my
-      self.parse Request::request('GET', HelpDeskAPI::Endpoints::TICKETS_MY_TICKETS)
+      HelpDeskAPI::Utilities.parse_response HelpDeskAPI::Request.request('GET', HelpDeskAPI::Endpoints::TICKETS_MY_TICKETS), 'tickets', Ticket
     end
 
     def self.unassigned
-      self.parse Request::request('GET', HelpDeskAPI::Endpoints::TICKETS_UNASSIGNED)
+      HelpDeskAPI::Utilities.parse_response HelpDeskAPI::Request.request('GET', HelpDeskAPI::Endpoints::TICKETS_UNASSIGNED), 'ticket', Ticket
     end
 
     def self.waiting
-      self.parse Request::request('GET', HelpDeskAPI::Endpoints::TICKETS_WAITING)
+      HelpDeskAPI::Utilities.parse_response HelpDeskAPI::Request.request('GET', HelpDeskAPI::Endpoints::TICKETS_WAITING), 'ticket', Ticket
     end
 
     def self.past_due
-      self.parse Request::request('GET', HelpDeskAPI::Endpoints::TICKETS_PAST_DUE)
-    end
-
-    private
-    def self.parse(hash)
-      hash['tickets'].map { |ticket_hash| Ticket.new.parse(ticket_hash) }
+      HelpDeskAPI::Utilities.parse_response HelpDeskAPI::Request.request('GET', HelpDeskAPI::Endpoints::TICKETS_PAST_DUE), 'ticket', Ticket
     end
   end
 end
