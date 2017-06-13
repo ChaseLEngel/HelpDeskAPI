@@ -48,7 +48,7 @@ module HelpDeskAPI
             ticket_id: @ticket_id
           }
         })
-      headers = {'authenticity_token': Authentication.authenticity_token, 'X-CSRF-Token': Authentication.csrf_token, 'Content-Type': 'application/json'}
+      headers = {'authenticity_token': HelpDeskAPI::Authentication.authenticity_token, 'X-CSRF-Token': HelpDeskAPI::Authentication.csrf_token, 'Content-Type': 'application/json'}
       response = HelpDeskAPI::Request.request('POST', Endpoints::TICKETS + "/#{@ticket_id}" + '/comments', payload, headers)
       parse JSON.parse(response)['comment']
     end

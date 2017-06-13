@@ -7,7 +7,7 @@ module HelpDeskAPI
 
     # Contact API given endpoint and return JSON
     def self.request(method, endpoint, payload = nil, headers = {})
-      headers = headers.merge({:cookies => Authentication.cookies})
+      headers = headers.merge({:cookies => HelpDeskAPI::Authentication.cookies})
       endpoint_response = nil
       case method
         when 'POST'
@@ -16,7 +16,7 @@ module HelpDeskAPI
               fail RequestError, "Error contacting #{response.request.url} with HTTP code: #{response.code}"
             end
             # Update cookies just incase
-            Authentication.cookies = response.cookies
+            HelpDeskAPI::Authentication.cookies = response.cookies
             endpoint_response = response
           end
         when 'GET'

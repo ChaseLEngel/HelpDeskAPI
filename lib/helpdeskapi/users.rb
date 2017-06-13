@@ -1,11 +1,12 @@
 require File.dirname(__FILE__) + '/request'
 require File.dirname(__FILE__) + '/endpoints'
 require File.dirname(__FILE__) + '/user'
+require File.dirname(__FILE__) + '/utilities'
 
 module HelpDeskAPI
   module Users
     def self.users
-      self.parse Request::request('GET', HelpDeskAPI::Endpoints::USERS)
+      HelpDeskAPI::Utilities.parse_response Request::request('GET', HelpDeskAPI::Endpoints::USERS), 'users', User
     end
 
     private

@@ -2,6 +2,7 @@ require File.dirname(__FILE__) + '/endpoints'
 require File.dirname(__FILE__) + '/utilities'
 require File.dirname(__FILE__) + '/request'
 require File.dirname(__FILE__) + '/comment'
+require File.dirname(__FILE__) + '/comments'
 
 module HelpDeskAPI
   class Ticket
@@ -54,10 +55,10 @@ module HelpDeskAPI
             due_at: nil,
             updated_at: nil,
             created_at: nil,
-            organization_id: organization_id,
+            organization_id: HelpDeskAPI::Authentication.organization_id,
             assignee_id: @assignee_id,
             assignee_type: 'User',
-            creator_id: creator_id,
+            creator_id: HelpDeskAPI::Authentication.creator_id,
             creator_type: 'User',
             custom_values: [],
             ticket_category_id: nil,
@@ -65,10 +66,9 @@ module HelpDeskAPI
             watchers: []
           }
         })
-      headers = {'authenticity_token': Authentication.authenticity_token, 'X-CSRF-Token': Authentication.csrf_token, 'Content-Type': 'application/json'}
+      headers = {'authenticity_token': HelpDeskAPI::Authentication.authenticity_token, 'X-CSRF-Token': HelpDeskAPI::Authentication.csrf_token, 'Content-Type': 'application/json'}
       response = HelpDeskAPI::Request.request('POST', Endpoints::TICKETS, payload, headers)
-      parse response['tickets'].first
-      return self
+      parse JSON.parse(response)['tickets'].first
     end
 
     def close
@@ -78,16 +78,16 @@ module HelpDeskAPI
     end
 
     def delete
-      headers = {'authenticity_token': Authentication.authenticity_token, 'X-CSRF-Token': Authentication.csrf_token, 'Content-Type': 'application/json'}
+      headers = {'authenticity_token': HelpDeskAPI::Authentication.authenticity_token, 'X-CSRF-Token': HelpDeskAPI::Authentication.csrf_token, 'Content-Type': 'application/json'}
       HelpDeskAPI::Request.request('DELETE', Endpoints::TICKETS + "/#{@id}", nil, headers)
     end
 
     def comments
-      Comments.comments @id
+      HelpDeskAPI::Comments.comments @id
     end
 
     def comment(body)
-      Comment.new @id, body
+      HelpDeskAPI::Comment.new @id, body
     end
   end
 end

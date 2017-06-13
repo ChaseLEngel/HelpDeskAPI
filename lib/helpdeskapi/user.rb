@@ -30,7 +30,7 @@ module HelpDeskAPI
     end
 
     def parse(user_hash)
-      Helpers::validateHash(user_hash, KEYS)
+      HelpDeskAPI::Utilities.validateHash(user_hash, KEYS)
       KEYS.each do |key|
         instance_variable_set '@'+key, user_hash[key]
         self.class.class_eval { attr_accessor key }
