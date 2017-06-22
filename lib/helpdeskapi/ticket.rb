@@ -46,9 +46,8 @@ module HelpDeskAPI
     end
 
     def submit
-      payload = JSON.generate(
-        {
-          'ticket': {
+      payload = JSON.generate({
+          ticket: {
             summary: @summary,
             description: @description,
             priority: @priority,

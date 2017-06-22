@@ -7,6 +7,8 @@ require File.dirname(__FILE__) + '/helpdeskapi/ticket'
 require File.dirname(__FILE__) + '/helpdeskapi/request'
 require File.dirname(__FILE__) + '/helpdeskapi/tickets'
 require File.dirname(__FILE__) + '/helpdeskapi/users'
+require File.dirname(__FILE__) + '/helpdeskapi/organizations'
+require File.dirname(__FILE__) + '/helpdeskapi/endpoints'
 
 module HelpDeskAPI
   class Client
@@ -17,11 +19,7 @@ module HelpDeskAPI
     NoCreatorIdError = Class.new(StandardError)
     RequestError = Class.new(StandardError)
 
-    URL = 'https://on.spiceworks.com/'
-    API_URL = URL + 'api/'
-
     def initialize(username, password)
-      @api = RestClient::Resource.new(API_URL)
       HelpDeskAPI::Authentication.username = username
       HelpDeskAPI::Authentication.password = password
       HelpDeskAPI::Authentication.authenticity_token = nil
@@ -34,9 +32,9 @@ module HelpDeskAPI
     def sign_in
       # Contact sign in page to set cookies.
       begin
-        sign_in_res = RestClient.get(URL + 'sign_in')
+        sign_in_res = RestClient.get(Endpoints::SIGN_IN)
       rescue RestClient::ExceptionWithResponse => error
-        fail SignInError, "Error contacting #{URL + 'sign_in'}: #{error}"
+        fail SignInError, "Error contacting #{Endpoints::SIGN_IN}: #{error}"
       end
 
       # Parse authenticity_token from sign in form.
@@ -62,10 +60,10 @@ module HelpDeskAPI
         'user[email_address]': HelpDeskAPI::Authentication.username,
         'user[password]': HelpDeskAPI::Authentication.password
       }
-      RestClient.post(URL + 'sessions', body, {:cookies => HelpDeskAPI::Authentication.cookies}) do |response, request, result, &block|
+      RestClient.post(Endpoints::SESSIONS, body, {:cookies => HelpDeskAPI::Authentication.cookies}) do |response, request, result, &block|
         # Response should be a 302 redirect from /sessions
         if Request::responseError?(response)
-          fail SessionsError, "Error contacting #{URL + 'sessions'}: #{error}"
+          fail SessionsError, "Error contacting #{Endpoints::SESSIONS}: #{error}"
         end
         # Update cookies just incase
         HelpDeskAPI::Authentication.cookies = response.cookies

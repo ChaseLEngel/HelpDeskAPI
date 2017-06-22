@@ -1,35 +1,32 @@
 require 'rest-client'
+
 require File.dirname(__FILE__) + '/authentication'
+require File.dirname(__FILE__) + '/endpoints'
 
 module HelpDeskAPI
   module Request
-    @api = RestClient::Resource.new 'https://on.spiceworks.com/api/'
+    @api = RestClient::Resource.new Endpoints::API_URL
 
     # Contact API given endpoint and return JSON
     def self.request(method, endpoint, payload = nil, headers = {})
       headers = headers.merge({:cookies => HelpDeskAPI::Authentication.cookies})
       endpoint_response = nil
+
       case method
         when 'POST'
-          @api[endpoint].post(payload, headers) do |response, request, result, &block|
-            if responseError?(response)
-              fail RequestError, "Error contacting #{response.request.url} with HTTP code: #{response.code}"
-            end
-            # Update cookies just incase
-            HelpDeskAPI::Authentication.cookies = response.cookies
-            endpoint_response = response
-          end
+          @api[endpoint].post(payload, headers) { |response, _, _, _| endpoint_response = response }
         when 'GET'
           endpoint_response = @api[endpoint].get(headers)
-          if responseError?(endpoint_response)
-            fail RequestError, "Error contacting #{response.request.url} with HTTP code: #{response.code}"
-          end
         when 'DELETE'
           endpoint_response = @api[endpoint].delete(headers)
-          if responseError?(endpoint_response)
-            fail RequestError, "Error contacting #{response.request.url} with HTTP code: #{response.code}"
-          end
+        when 'PUT'
+          endpoint_response = @api[endpoint].put(payload, headers)
       end
+
+      if responseError?(endpoint_response)
+        fail RequestError, "Error contacting #{endpoint_response.request.url} with HTTP code: #{endpoint_response.code}"
+      end
+
       return endpoint_response
     end
 
