@@ -9,15 +9,10 @@ require File.dirname(__FILE__) + '/helpdeskapi/tickets'
 require File.dirname(__FILE__) + '/helpdeskapi/users'
 require File.dirname(__FILE__) + '/helpdeskapi/organizations'
 require File.dirname(__FILE__) + '/helpdeskapi/endpoints'
+require File.dirname(__FILE__) + '/helpdeskapi/exceptions'
 
 module HelpDeskAPI
   class Client
-    SignInError  = Class.new(StandardError)
-    AuthenticityTokenError = Class.new(StandardError)
-    CsrfTokenError = Class.new(StandardError)
-    SessionsError = Class.new(StandardError)
-    NoCreatorIdError = Class.new(StandardError)
-    RequestError = Class.new(StandardError)
 
     def initialize(username, password)
       HelpDeskAPI::Authentication.username = username
@@ -34,21 +29,21 @@ module HelpDeskAPI
       begin
         sign_in_res = RestClient.get(Endpoints::SIGN_IN)
       rescue RestClient::ExceptionWithResponse => error
-        fail SignInError, "Error contacting #{Endpoints::SIGN_IN}: #{error}"
+        fail HelpDeskAPI::Exceptions.SignInError, "Error contacting #{Endpoints::SIGN_IN}: #{error}"
       end
 
       # Parse authenticity_token from sign in form.
       page = Nokogiri::HTML(sign_in_res)
       HelpDeskAPI::Authentication.authenticity_token = page.css('form').css('input')[1]['value']
       unless HelpDeskAPI::Authentication.authenticity_token
-        fail AuthenticityTokenError, 'Error parsing authenticity_token: Token not found.'
+        fail HelpDeskAPI::Exceptions.AuthenticityTokenError, 'Error parsing authenticity_token: Token not found.'
       end
       # Parse sign_in HTML for csrf-token
       page.css('meta').each do |tag|
         HelpDeskAPI::Authentication.csrf_token = tag['content'] if tag['name'] == 'csrf-token'
       end
       unless HelpDeskAPI::Authentication.csrf_token
-        fail CsrfTokenError, 'No csrf-token found'
+        fail HelpDeskAPI::Exceptions.CsrfTokenError, 'No csrf-token found'
       end
 
       # Set cookies for later requests
@@ -63,7 +58,7 @@ module HelpDeskAPI
       RestClient.post(Endpoints::SESSIONS, body, {:cookies => HelpDeskAPI::Authentication.cookies}) do |response, request, result, &block|
         # Response should be a 302 redirect from /sessions
         if Request::responseError?(response)
-          fail SessionsError, "Error contacting #{Endpoints::SESSIONS}: #{error}"
+          fail HelpDeskAPI::Exceptions.SessionsError, "Error contacting #{Endpoints::SESSIONS}: #{error}"
         end
         # Update cookies just incase
         HelpDeskAPI::Authentication.cookies = response.cookies

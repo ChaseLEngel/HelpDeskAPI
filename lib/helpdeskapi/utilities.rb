@@ -1,14 +1,14 @@
 require 'json'
 
+require File.dirname(__FILE__) + '/exceptions'
+
 module HelpDeskAPI
   module Utilities
-    MissingKey = Class.new(StandardError)
-
     # Makes sure all keys exist in hash
     def self.validateHash(hash, keys)
       keys.each do |key|
         unless hash.has_key? key
-          fail MissingKey, "Missing key #{key} in hash:\n#{hash}\n"
+          fail HelpDeskAPI::Exceptions.MissingKey, "Missing key #{key} in hash:\n#{hash}\n"
         end
       end
     end

@@ -2,6 +2,7 @@ require 'rest-client'
 
 require File.dirname(__FILE__) + '/authentication'
 require File.dirname(__FILE__) + '/endpoints'
+require File.dirname(__FILE__) + '/exceptions'
 
 module HelpDeskAPI
   module Request
@@ -24,7 +25,7 @@ module HelpDeskAPI
       end
 
       if responseError?(endpoint_response)
-        fail RequestError, "Error contacting #{endpoint_response.request.url} with HTTP code: #{endpoint_response.code}"
+        fail HelpDeskAPI::Exceptions.RequestError, "Error contacting #{endpoint_response.request.url} with HTTP code: #{endpoint_response.code}"
       end
 
       return endpoint_response
