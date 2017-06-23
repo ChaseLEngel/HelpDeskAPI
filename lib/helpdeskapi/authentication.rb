@@ -1,5 +1,5 @@
 require 'singleton'
-require File.dirname(__FILE__) + '/tickets'
+require File.dirname(__FILE__) + '/organizations'
 
 module HelpDeskAPI
   module Authentication
@@ -12,8 +12,6 @@ module HelpDeskAPI
     private
     class Data
       include Singleton
-
-      OrganizationIdError = Class.new(StandardError)
 
       attr_accessor :username, :password, :authenticity_token, :csrf_token, :cookies
 
@@ -45,15 +43,11 @@ module HelpDeskAPI
         fail NoCreatorIdError, "Failed to find creator_id for user: #{@username}"
       end
 
-      # Returns organization_id by parsing existing tickets.
-      # At least one ticket MUST exist when this is called.
+      # Returns organization_id or contacts API to get
+      # id of first organization.
       def organization_id
         return @organization_id if @organization_id
-        tickets = HelpDeskAPI::Tickets.all
-        if tickets.empty?
-          fail OrganizationIdError, "At least one ticket must exist to parse organization_id."
-        end
-        @organization_id = tickets.first.organization_id
+        @organization_id = HelpDeskAPI::Organizations.organizations.first.id
       end
     end
   end
