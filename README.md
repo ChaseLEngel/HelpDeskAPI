@@ -2,6 +2,12 @@ Ruby library for Spiceworks Help Desk.
 
 Currently only basic actions have been implemented.
 
+### Installation
+```
+$ gem build helpdeskapi.gemspec
+$ gem install ./HelpDeskAPI-1.0.0.gem
+```
+
 Note: Some actions require administrator user
 ### Signing in
 ```
